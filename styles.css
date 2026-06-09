@@ -1287,54 +1287,30 @@ h1, h2, h3, h4, p { margin: 0; }
 .hero-variant-2 .header-inner > .logo {
   position: absolute;
   left: 50%;
-  /* Hero starts at margin-top (24px). Setting top:10px places the pill
-     top 14px above the hero edge → pill overhangs into the gutter,
-     bottom ~30px sits on the hero. Tune --hero-pill-overhang to taste. */
-  top: 10px;
+  top: 18px;
   transform: translateX(-50%);
   z-index: 3;
   display: inline-flex;
   align-items: center;
-  padding: 14px 26px;
-  border-radius: 999px;
-  /* Match .research-inner's layered gradient */
-  background:
-    radial-gradient(60% 60% at 20% 30%, rgba(140, 90, 220, 0.4), transparent 70%),
-    radial-gradient(50% 60% at 90% 80%, rgba(80, 50, 160, 0.5), transparent 70%),
-    linear-gradient(135deg, #1a0b2e 0%, #2a1a52 50%, #4b2f95 100%);
-  /* Two-layer shadow: a tight 1px close shadow lifts the pill off the
-     hero, and the wider diffuse shadow gives it ambient depth. */
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.5),
-    0 6px 18px rgba(20, 20, 30, 0.22);
-  /* Contain the grain layer's blend to within the pill, and clip to the
-     fully-rounded shape so the grain follows the pill outline. */
-  isolation: isolate;
-  overflow: hidden;
-  transition: box-shadow .25s ease, transform .25s ease;
-}
-/* Grain overlay — same SVG noise + overlay blend used by .research-inner */
-.hero-variant-2 .header-inner > .logo::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  background-size: 320px 320px;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  border-radius: inherit;
+  outline: none;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+  isolation: auto;
+  overflow: visible;
 }
 .hero-variant-2 .header-inner > .logo .logo-img {
   position: relative; /* sit above the grain layer */
   z-index: 1;
-  height: 16px;
+  width: 130px;
+  height: auto;
 }
 /* In v2 desktop the pill uses the white wordmark; the default purple one hides */
 .hero-variant-2 .header-inner > .logo .logo-img-default { display: none; }
 .hero-variant-2 .header-inner > .logo .logo-img-pill { display: block; }
 .hero-variant-2 .site-header.is-scrolled .header-inner > .logo {
-  box-shadow: 0 4px 14px rgba(20, 20, 30, 0.18);
+  box-shadow: none;
 }
 
 /* Nav uses a 3-column grid (1fr | slot | 1fr) so the slot lives at
@@ -2093,14 +2069,9 @@ h1, h2, h3, h4, p { margin: 0; }
 }
 
 /* ---------- Partner credit (101 Studios) ---------- */
-/* Fixed below the v2 Rembrand pill (which sits at top: 10px and is
-   ~44px tall = bottom edge ~54px). 16px gap below the pill puts the
-   partner mark at top: 70px. z-index 30 keeps it above slide content
-   but below the floating header pill (z-index 50). pointer-events:
-   none so it never blocks clicks on slide CTAs underneath. */
 .gallery-partner {
   position: fixed;
-  top: 70px;
+  top: 66px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 30;
@@ -2113,12 +2084,11 @@ h1, h2, h3, h4, p { margin: 0; }
   height: 38px;
   width: auto;
   display: block;
-  opacity: 0.7;
 }
 
 /* Page-level: dark canvas surrounding the cinema frames */
 .gallery-page {
-  background: #0a0a0a;
+  background: #101010;
   color: #fff;
   /* Vertical scroll-snap. Switched from `mandatory` to `proximity` so
      the JS rAF tween (snapToNearest -> scrollToY) controls snap timing.
@@ -2134,6 +2104,7 @@ h1, h2, h3, h4, p { margin: 0; }
    so the document scroll naturally exits into the footer. */
 .gallery-scroller {
   display: block;
+  padding-top: 40px;
 }
 
 /* ---------- Loader overlay ---------- */
@@ -2143,7 +2114,7 @@ h1, h2, h3, h4, p { margin: 0; }
   position: fixed;
   inset: 0;
   z-index: 60; /* above v2 header, which is z:50 */
-  background: #0a0a0a;
+  background: #101010;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2213,36 +2184,22 @@ h1, h2, h3, h4, p { margin: 0; }
    is what gives the "film frame" / theater feel. */
 .gallery-slide-frame {
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: min(100%, calc(75dvh * 1528 / 761), 1600px);
+  height: auto;
+  aspect-ratio: 1528 / 761;
   max-width: 1600px;
-  max-height: 75vh;
   border-radius: 28px;
   overflow: hidden;
   isolation: isolate;
   background: #111;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
 }
-/* CINEMA REEL APERTURE
-   ---------------------
-   The frame (.gallery-slide-frame) is the fixed cropping window —
-   overflow: hidden + border-radius give us the projector-gate shape.
-   Inside it sits .gallery-slide-image-wrap, oversized and panning
-   slowly via --pan; inside that is the image, panning a touch faster
-   via --image-pan. Same sign on both stacks the motion.
-
-   At p=0.7 the wrapper translates -21vh and the image adds -15.4vh,
-   for a combined -36.4vh of visible content shift through the gate.
-   The wrapper's 37.5vh overhang absorbs that with ~1vh of safety
-   margin. Image content renders at ~200% of frame height.
-
-   To increase the effect, raise --pan + --image-pan together AND
-   grow the wrapper inset to keep absorbing the larger peak. Rule of
-   thumb: keep `(|pan| + |image-pan|) × 0.7 ≤ wrapper_overhang`. */
+/* Match the aperture to the exported 1528x761 stills so the full image,
+   including baked-in edge labels, is visible instead of being cropped. */
 .gallery-slide-image-wrap {
   position: absolute;
-  inset: -5% 0;           /* height = 110% of frame; ~3.75vh overhang each side */
-  --pan: -3vh;            /* small — pan budget capped at 110% zoom */
+  inset: 0;
+  --pan: 0vh;
   transform: translate3d(0, calc(var(--p, 0) * var(--pan)), 0);
   will-change: transform;
 }
@@ -2251,9 +2208,9 @@ h1, h2, h3, h4, p { margin: 0; }
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
-  --image-pan: -2vh;      /* small — combined ~5vh peak fits the 3.75vh overhang */
+  --image-pan: 0vh;
   transform: translate3d(0, calc(var(--p, 0) * var(--image-pan)), 0);
   scale: 1;
   filter: blur(0px);
@@ -2286,11 +2243,6 @@ h1, h2, h3, h4, p { margin: 0; }
   .gallery-slide[data-slide="3"] .gallery-slide-image-off {
     object-position: 38% 50%;
   }
-  .gallery-slide[data-slide="4"] .gallery-slide-image,
-  .gallery-slide[data-slide="4"] .gallery-slide-image-off {
-    object-position: 32% 50%;
-  }
-
   /* First slide: meta column sat visually high vs other slides after tight crops */
   .gallery-slide[data-slide="0"] .gallery-slide-meta-top {
     top: 7.5dvh;
@@ -2304,7 +2256,7 @@ h1, h2, h3, h4, p { margin: 0; }
    inactive slides, and the transition back to 0 on activate would read
    as a pop covering the photo. */
 .gallery-slide:not(.is-active) .gallery-slide-image:not(.gallery-slide-image-off) {
-  scale: 1.04;
+  scale: 1;
   filter: blur(6px);
   opacity: 0.85;
 }
@@ -2331,7 +2283,7 @@ h1, h2, h3, h4, p { margin: 0; }
      intro carries the streak via scale-Y + blur + opacity only.
      Excludes the off-image so the loader's opacity:0.6 doesn't reveal
      the brand-removed layer briefly during the intro reveal. */
-  scale: 1.04 1.30;    /* baseline 1.04 with vertical streak */
+  scale: 1 1.08;
   filter: blur(22px);
   opacity: 0.6;
   transition:
@@ -2679,7 +2631,7 @@ h1, h2, h3, h4, p { margin: 0; }
    they scroll past the last slide. Aligned to "end" so the page
    stops with the footer at the bottom of the viewport. */
 .gallery-footer {
-  background: #0a0a0a;
+  background: #101010;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   scroll-snap-align: end;
   padding-top: 48px;
@@ -2720,11 +2672,6 @@ h1, h2, h3, h4, p { margin: 0; }
   .gallery-slide[data-slide="3"] .gallery-slide-image-off {
     object-position: calc(32% + 150px) 50%;
   }
-  .gallery-slide[data-slide="4"] .gallery-slide-image,
-  .gallery-slide[data-slide="4"] .gallery-slide-image-off {
-    object-position: calc(32% + 85px) 50%;
-  }
-
   /* Mobile: same 80dvh slide / 72dvh frame proportions as desktop. */
   .gallery-slide { height: 80dvh; padding: 2dvh 12px; }
   .gallery-slide-frame { max-height: 72dvh; border-radius: 12px; }
@@ -2781,10 +2728,6 @@ h1, h2, h3, h4, p { margin: 0; }
   .gallery-slide[data-slide="3"] .gallery-slide-image-off {
     object-position: calc(32% + 55px) 50%;     /* sec4 iPhone: +10 vs prior +45 */
   }
-  .gallery-slide[data-slide="4"] .gallery-slide-image,
-  .gallery-slide[data-slide="4"] .gallery-slide-image-off {
-    object-position: calc(32% + 35px) 50%;    /* was +85px on tablet: −50 on iPhone */
-  }
 }
 
 /* Phone landscape: width is often *above* 768px, so (max-width:768px) never matched and
@@ -2799,9 +2742,7 @@ h1, h2, h3, h4, p { margin: 0; }
   .gallery-page .gallery-slide[data-slide="2"] .gallery-slide-image,
   .gallery-page .gallery-slide[data-slide="2"] .gallery-slide-image-off,
   .gallery-page .gallery-slide[data-slide="3"] .gallery-slide-image,
-  .gallery-page .gallery-slide[data-slide="3"] .gallery-slide-image-off,
-  .gallery-page .gallery-slide[data-slide="4"] .gallery-slide-image,
-  .gallery-page .gallery-slide[data-slide="4"] .gallery-slide-image-off {
+  .gallery-page .gallery-slide[data-slide="3"] .gallery-slide-image-off {
     object-position: center;
   }
 }
@@ -2828,4 +2769,3 @@ h1, h2, h3, h4, p { margin: 0; }
   .gallery-loader-mark img { animation: none; }
   .gallery-loader-line span { animation: none; }
 }
-
