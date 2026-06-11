@@ -2221,6 +2221,12 @@ h1, h2, h3, h4, p { margin: 0; }
     opacity .9s ease;
   will-change: transform, scale, filter;
 }
+.gallery-slide-image-variant {
+  opacity: 0;
+}
+.gallery-slide-image-variant.is-variant-active {
+  opacity: 1;
+}
 
 /* ----- Per-slide focal points: desktop vs narrow viewports -----
    Aggressive calc(100% + Npx) reads well on phone width but skews badly on
@@ -2260,6 +2266,9 @@ h1, h2, h3, h4, p { margin: 0; }
   filter: blur(6px);
   opacity: 0.85;
 }
+.gallery-slide:not(.is-active) .gallery-slide-image-variant:not(.is-variant-active) {
+  opacity: 0;
+}
 /* Cinematic vignette over every image — same recipe as our hero overlay */
 .gallery-slide-vignette {
   position: absolute;
@@ -2269,6 +2278,58 @@ h1, h2, h3, h4, p { margin: 0; }
     radial-gradient(ellipse 60% 35% at 50% 100%, rgba(0,0,0,0.55), transparent 60%),
     radial-gradient(ellipse 60% 35% at 50% 0%,   rgba(0,0,0,0.45), transparent 60%);
   pointer-events: none;
+}
+
+/* Local image variants inside a slide */
+.gallery-variant-nav {
+  inset: 0;
+  pointer-events: none;
+}
+.gallery-variant-btn {
+  position: absolute;
+  top: 50%;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(16, 16, 16, 0.2);
+  color: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px) saturate(130%);
+  -webkit-backdrop-filter: blur(10px) saturate(130%);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+.gallery-variant-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.gallery-variant-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #fff;
+  transform: translateY(-50%) scale(1.04);
+}
+.gallery-variant-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.62);
+  outline-offset: 4px;
+}
+.gallery-variant-btn-prev {
+  left: clamp(18px, 3dvh, 42px);
+}
+.gallery-variant-btn-next {
+  right: clamp(18px, 3dvh, 42px);
 }
 
 /* ---------- Intro reveal (first slide on load) ---------- */
@@ -2687,6 +2748,16 @@ h1, h2, h3, h4, p { margin: 0; }
   .gallery-slide-credits > div { gap: 8px; }
   .gallery-slide-quotes { display: none; }
   .gallery-pagination { display: none; }
+  .gallery-variant-btn {
+    width: 30px;
+    height: 30px;
+  }
+  .gallery-variant-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .gallery-variant-btn-prev { left: 0; }
+  .gallery-variant-btn-next { right: 0; }
 
   /* On/Off: min touch target (44px), stays aligned under Virtual 2D/3D pill */
   .gallery-slide-meta-top .gallery-slide-onoff {
